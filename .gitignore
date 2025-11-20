@@ -3,31 +3,62 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environments
-env/
-.venv/
-venv/
-
 # Byte-compiled / optimized / DLL files
 *.pyc
 *.pyo
 *.pyd
 
+# Virtual environments
+env/
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
 # Distribution / packaging
 build/
 dist/
 *.egg-info/
+.eggs/
 
 # Django
 *.log
-db.sqlite3
-media/
+*.pot
+**/db.sqlite3
+**/db.sqlite3-journal
+**/db.sqlite3-*
+**/media/
+**/staticfiles/
+**/static/
+local_settings.py
 
 # Editor files
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
+.DS_Store
 
 # Environment files
 .env
 .env.*
+!.env.example
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest
+.pytest_cache/
+.tox/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
