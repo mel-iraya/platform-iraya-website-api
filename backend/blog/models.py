@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.utils import timezone
 from django.contrib.auth.models import User
 # Create your models here.
 
@@ -17,15 +18,39 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     content = models.TextField()
-    published = models.BooleanField(default=False, help_text="Check to mark this post as published.")
+    # status: draft or published
+    STATUS_DRAFT = 'draft'
+    STATUS_PUBLISHED = 'published'
+    STATUS_CHOICES = [
+        (STATUS_DRAFT, 'Draft'),
+        (STATUS_PUBLISHED, 'Published'),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_DRAFT)
     published_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Tags: allow multiple labels such as 'News', 'Events', 'Conference', etc.
     tags = models.ManyToManyField('Tag', related_name='posts', blank=True)
+    
+        def get_content_markdown(self):
+            import markdown
+            return markdown.markdown(self.content)
+
+    @property
+    def published(self):
+        """Derived property from status field - returns True if status is 'published'"""
+        return self.status == self.STATUS_PUBLISHED
 
     def save(self, *args, **kwargs):
+        # auto-generate slug when missing
         if not self.slug:
             self.slug = slugify(self.title)[:255]
+
+        # set published_at timestamp when publishing
+        if self.status == self.STATUS_PUBLISHED:
+            if not self.published_at:
+                self.published_at = timezone.now()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -49,7 +74,7 @@ class PostImage(models.Model):
     post = models.ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='post_images/')
     caption = models.CharField(max_length=255, blank=True, help_text="Optional caption for the image")
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField(default=0, help_text="Order of image in gallery (lower numbers appear first)")
     is_cover = models.BooleanField(default=False, help_text="Mark this image as the cover/featured image")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -62,10 +87,6 @@ class PostImage(models.Model):
         return f"Image for {self.post.title} (Order: {self.order})"
 
     def save(self, *args, **kwargs):
-        # Auto-assign order if not set or duplicate
-        if self.order == 0 or PostImage.objects.filter(post=self.post, order=self.order).exclude(pk=self.pk).exists():
-            max_order = PostImage.objects.filter(post=self.post).exclude(pk=self.pk).aggregate(models.Max('order'))['order__max']
-            self.order = (max_order or 0) + 1
         # If this is marked as cover, unmark all other images for this post
         if self.is_cover:
             PostImage.objects.filter(post=self.post, is_cover=True).exclude(pk=self.pk).update(is_cover=False)
@@ -84,8 +105,9 @@ class Comment(models.Model):
         if self.user:
             return f"Comment by {self.user.username} on {self.post.title}"
         return f"Comment by {self.author_name or 'Anonymous'} on {self.post.title}"
-
+    
     def get_author_display(self):
+        """Returns the display name for the comment author"""
         if self.user:
             return self.user.get_full_name() or self.user.username
         return self.author_name or 'Anonymous'
