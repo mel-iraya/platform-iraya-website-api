@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Q
 from rest_framework import viewsets
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 from .serializers import PostSerializer, CommentSerializer
 
 # Create your views here.
@@ -25,3 +25,13 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-created_at')
     serializer_class = CommentSerializer
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Read-only API endpoint for tags.
+    Allows listing all tags and retrieving individual tags.
+    Create, update, and delete operations are only available through admin.
+    """
+    queryset = Tag.objects.all().order_by('name')
+    serializer_class = TagSerializer
