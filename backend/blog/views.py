@@ -1,14 +1,10 @@
 from django.shortcuts import render
 from django.db.models import Q
 from rest_framework import viewsets
-from .models import Author, Post, Comment, Tag
-from .serializers import AuthorSerializer, PostSerializer, CommentSerializer, TagSerializer
+from .models import Post, Comment
+from .serializers import PostSerializer, CommentSerializer
 
 # Create your views here.
-class AuthorViewSet(viewsets.ModelViewSet):
-    queryset = Author.objects.all()
-    serializer_class = AuthorSerializer
-
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
@@ -24,13 +20,8 @@ class PostViewSet(viewsets.ModelViewSet):
         if tag:
             # allow either tag name or tag slug (case-insensitive)
             qs = qs.filter(Q(tags__name__iexact=tag) | Q(tags__slug__iexact=tag))
-        return qs.distinct()
+        return qs
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-created_at')
     serializer_class = CommentSerializer
-
-
-class TagViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all().order_by('name')
-    serializer_class = TagSerializer
