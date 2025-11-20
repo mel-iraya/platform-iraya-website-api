@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment, PostImage
+from .models import Post, Comment, PostImage, Tag
 import markdown as md
 
 class PostImageSerializer(serializers.ModelSerializer):
@@ -73,3 +73,11 @@ class PostSerializer(serializers.ModelSerializer):
             return first_image.image.url
         
         return None
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """Read-only serializer for tags"""
+    class Meta:
+        model = Tag
+        fields = ['id', 'name', 'slug']
+        read_only_fields = ['id', 'name', 'slug']
