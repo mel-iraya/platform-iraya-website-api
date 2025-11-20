@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.db.models import Q
 from rest_framework import viewsets
-from .models import Post, Comment, Tag
-from .serializers import PostSerializer, CommentSerializer, TagSerializer
+from .models import Post, Comment, Tag, Author
+from .serializers import PostSerializer, CommentSerializer, TagSerializer, AuthorSerializer
 
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):
@@ -35,3 +35,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Tag.objects.all().order_by('name')
     serializer_class = TagSerializer
+
+
+class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
