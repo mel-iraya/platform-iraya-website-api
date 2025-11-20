@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.db.models import Q
 from rest_framework import viewsets
 from .models import Post, Comment, Tag
-from .serializers import PostSerializer, CommentSerializer
+from .serializers import PostSerializer, CommentSerializer, TagSerializer
 
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):
