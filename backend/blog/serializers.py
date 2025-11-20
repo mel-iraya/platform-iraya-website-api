@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment, PostImage, Tag
+from .models import Post, Comment, PostImage, Tag, Author
 import markdown as md
 
 class PostImageSerializer(serializers.ModelSerializer):
@@ -26,20 +26,25 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'post', 'user', 'author_name', 'author_display', 'body', 'created_at', 'approved']
         read_only_fields = ['author_display']
 
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ['id', 'name', 'email', 'bio', 'created_at']
+
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     images = PostImageSerializer(many=True, read_only=True)
     cover_image = serializers.SerializerMethodField()
     content_html = serializers.SerializerMethodField()
-    tags = serializers.StringRelatedField(many=True, read_only=True)  # Simple tag names
-    author_name = serializers.CharField(source='author.name', read_only=True)
+    tags = serializers.StringRelatedField(many=True, read_only=True)
+    author = AuthorSerializer(read_only=True)
 
     class Meta:
         model = Post
-        fields = ['id', 'author', 'author_name', 'title', 'slug', 'content', 'content_html', 'status', 
+        fields = ['id', 'author', 'title', 'slug', 'content', 'content_html', 'status', 
                   'published', 'published_at', 'created_at', 'updated_at', 'comments', 'images', 
                   'cover_image', 'tags']
-        read_only_fields = ['published', 'author_name', 'images', 'cover_image', 'comments', 'tags', 'content_html']
+        read_only_fields = ['published', 'images', 'cover_image', 'comments', 'tags', 'content_html']
     
     def get_content_html(self, obj):
         """Convert markdown content to HTML"""
