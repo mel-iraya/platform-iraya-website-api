@@ -15,6 +15,12 @@ class PostViewSet(viewsets.ModelViewSet):
         if tag:
             qs = qs.filter(Q(tags__name__iexact=tag) | Q(tags__slug__iexact=tag))
         return qs
+    
+    def get_serializer_context(self):
+        """Ensure request context is passed to serializer"""
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 
 class CommentViewSet(viewsets.ModelViewSet):
