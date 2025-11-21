@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.conf import settings
 from .models import Post, Comment, PostImage, Tag, Author
 import markdown as md
 
@@ -10,10 +11,16 @@ class PostImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'created_at']
     
     def get_image(self, obj):
-        request = self.context.get('request')
         if obj.image:
+            request = self.context.get('request')
             if request is not None:
                 return request.build_absolute_uri(obj.image.url)
+            # Fallback: build absolute URL for development
+            # This ensures frontend always gets absolute URLs
+            if settings.DEBUG:
+                # For local development, use localhost
+                return f"http://127.0.0.1:8000{obj.image.url}"
+            # For production, you should set up proper domain handling
             return obj.image.url
         return None
 
@@ -57,12 +64,14 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_cover_image(self, obj):
         """Get the first image from the gallery as cover image"""
-        request = self.context.get('request')
-        
         first_image = obj.images.first()
         if first_image and first_image.image:
+            request = self.context.get('request')
             if request is not None:
                 return request.build_absolute_uri(first_image.image.url)
+            # Fallback: build absolute URL for development
+            if settings.DEBUG:
+                return f"http://127.0.0.1:8000{first_image.image.url}"
             return first_image.image.url
         
         return None
