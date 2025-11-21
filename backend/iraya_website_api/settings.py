@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     
     # Local apps
     'blog',
+    'publications',
 ]
 
 MIDDLEWARE = [
