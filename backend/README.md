@@ -24,7 +24,7 @@ python -m venv .venv
 3. Install dependencies:
 
 ```
-pip install django djangorestframework django-cors-headers pillow
+pip install -r requirements.txt
 ```
 
 4. Migrate and (optional) create admin:
