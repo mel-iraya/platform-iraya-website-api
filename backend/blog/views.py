@@ -1,7 +1,7 @@
 from django.db.models import Q
 from rest_framework import viewsets
-from .models import Post, Comment, Tag
-from .serializers import PostSerializer, CommentSerializer, TagSerializer
+from .models import Post, Comment, Tag, PostImage
+from .serializers import PostSerializer, CommentSerializer, TagSerializer, PostImageSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -31,4 +31,9 @@ class CommentViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all().order_by('name')
     serializer_class = TagSerializer
+
+
+class PostImageViewSet(viewsets.ModelViewSet):
+    queryset = PostImage.objects.all().order_by('-created_at')
+    serializer_class = PostImageSerializer
 
