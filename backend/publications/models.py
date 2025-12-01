@@ -1,39 +1,43 @@
 from django.db import models
 
 
-class PublicationType(models.TextChoices):
-    PUBLICATION = 'publication', 'Publication'
-    BROCHURE = 'brochure', 'Brochure'
+
 
 
 class Publication(models.Model):
-    """Model for storing publications and brochures with PDF files"""
+    """Model for storing publications matching the frontend structure"""
+    TYPE_CHOICES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+    ]
+    CONTENT_TYPE_CHOICES = [
+        ('content', 'Content'),
+        ('list', 'List'),
+    ]
+
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='image')
+    image = models.ImageField(upload_to='publications/images/', blank=True, null=True)
+    alt = models.CharField(max_length=255, blank=True)
+    video_id = models.CharField(max_length=255, blank=True, help_text="YouTube Video ID")
+    
     title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, help_text="Optional description of the publication/brochure")
-    pdf_file = models.FileField(upload_to='publications/', help_text="Upload PDF file for this publication/brochure")
-    publication_type = models.CharField(
-        max_length=20,
-        choices=PublicationType.choices,
-        default=PublicationType.PUBLICATION,
-        help_text="Select whether this is a publication or brochure"
-    )
-    # Event/Conference information (optional, for publications presented at events)
-    event_name = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text="Name of the event or conference (e.g., 'EAGE Annual')"
-    )
-    location = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text="Location or venue (e.g., 'Vienna, Austria')"
-    )
-    event_date = models.DateField(
-        null=True,
-        blank=True,
-        help_text="Date of the event or publication (e.g., June 2023)"
-    )
-    published = models.BooleanField(default=False, help_text="Check to make this available for download")
+    sub_text = models.CharField(max_length=255, blank=True)
+    
+    content_type = models.CharField(max_length=10, choices=CONTENT_TYPE_CHOICES, default='content')
+    content = models.TextField(blank=True)
+    content1 = models.TextField(blank=True, help_text="First list item")
+    content2 = models.TextField(blank=True, help_text="Second list item")
+    
+    show_button = models.BooleanField(default=True)
+    button_on_hover = models.BooleanField(default=False)
+    button_color = models.CharField(max_length=50, default='primary')
+    
+    email = models.BooleanField(default=False)
+    rounded_img = models.BooleanField(default=False)
+    elevation = models.CharField(max_length=10, blank=True, default='0')
+
+    # Keep existing useful fields
+    pdf_file = models.FileField(upload_to='publications/', blank=True, null=True, help_text="Upload PDF file for download button")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -43,5 +47,20 @@ class Publication(models.Model):
         verbose_name_plural = 'Publications'
 
     def __str__(self):
-        return f"{self.get_publication_type_display()}: {self.title}"
+        return self.title
+
+
+class PublicationImage(models.Model):
+    """Model for storing multiple images per publication with gallery support"""
+    publication = models.ForeignKey(Publication, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='publication_images/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Publication Image'
+        verbose_name_plural = 'Publication Images'
+
+    def __str__(self):
+        return f"Image for {self.publication.title}"
 

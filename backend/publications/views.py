@@ -11,23 +11,18 @@ class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.all().order_by('-created_at')
     serializer_class = PublicationSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'description', 'event_name', 'location']
-    ordering_fields = ['created_at', 'title', 'event_date']
+    search_fields = ['title', 'sub_text', 'content']
+    ordering_fields = ['created_at', 'title']
     ordering = ['-created_at']
 
     def get_queryset(self):
         """Filter to show only published publications by default"""
         queryset = super().get_queryset()
         
-        # Filter by publication_type if provided
-        publication_type = self.request.query_params.get('publication_type')
-        if publication_type:
-            queryset = queryset.filter(publication_type=publication_type)
-        
-        # By default, only show published items unless explicitly requested
-        show_all = self.request.query_params.get('show_all', 'false').lower() == 'true'
-        if not show_all:
-            queryset = queryset.filter(published=True)
+        # Filter by type if provided
+        type_param = self.request.query_params.get('type')
+        if type_param:
+            queryset = queryset.filter(type=type_param)
         
         return queryset
 

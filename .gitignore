@@ -62,3 +62,6 @@ coverage.xml
 .dmypy.json
 dmypy.json
 
+Frontend
+frontend/
+backend/publications/management/
