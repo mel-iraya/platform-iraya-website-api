@@ -5,6 +5,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.files import File
 from blog.models import Post, Author, Tag
 
 class Command(BaseCommand):
@@ -16,6 +17,7 @@ class Command(BaseCommand):
         # Assuming the command is run from api root, pointing to ../content/blog
         base_dir = Path(__file__).resolve().parent.parent.parent.parent.parent
         blog_content_dir = base_dir / 'content' / 'blog'
+        assets_dir = base_dir / 'assets' / 'blog'
         
         self.stdout.write(f"Looking for markdown files in: {blog_content_dir}")
         
@@ -40,11 +42,11 @@ class Command(BaseCommand):
 
         for md_file in md_files:
             try:
-                self.process_file(md_file, default_author)
+                self.process_file(md_file, default_author, assets_dir)
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Failed to process {md_file.name}: {e}"))
 
-    def process_file(self, file_path, author):
+    def process_file(self, file_path, author, assets_dir):
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
@@ -114,6 +116,26 @@ class Command(BaseCommand):
         if 'event' in title.lower() or 'conference' in title.lower():
             t, _ = Tag.objects.get_or_create(name='Events')
             post.tags.add(t)
+            
+        # Handle Image Upload
+        if image_path:
+            # image_path usually looks like "/assets/blog/Filename.webp"
+            # We want just "Filename.webp"
+            filename = Path(image_path).name
+            local_img_path = assets_dir / filename
+            
+            if local_img_path.exists():
+                # Check if we already have an image to avoid re-uploading every time?
+                # For simplicity, we can overwrite or skip if exists. 
+                # Let's overwrite or ensure it's there.
+                try:
+                    with open(local_img_path, 'rb') as f:
+                        post.image.save(filename, File(f), save=True)
+                        self.stdout.write(f"  Uploaded image: {filename}")
+                except Exception as e:
+                    self.stdout.write(self.style.WARNING(f"  Failed to upload image {filename}: {e}"))
+            else:
+                self.stdout.write(self.style.WARNING(f"  Image definition found but file missing: {local_img_path}"))
         
         action = "Created" if created else "Updated"
         self.stdout.write(self.style.SUCCESS(f"{action} post: {title}"))
