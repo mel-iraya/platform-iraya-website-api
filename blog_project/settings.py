@@ -146,3 +146,6 @@ CORS_ALLOWED_ORIGINS = [
 # Media (for uploaded images) - useful if you add ImageField to your Post model
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Force reload
+

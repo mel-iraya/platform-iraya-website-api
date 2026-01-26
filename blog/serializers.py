@@ -24,7 +24,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'author', 'title', 'slug', 'content', 'status', 'published', 'published_at', 'created_at', 'updated_at', 'comments', 'image', 'tags', 'markdown']
+        fields = ['id', 'author', 'title', 'slug', 'content', 'status', 'published', 'published_at', 'created_at', 'updated_at', 'comments', 'image', 'static_image_path', 'tags', 'markdown']
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -32,6 +32,9 @@ class PostSerializer(serializers.ModelSerializer):
             if request is not None:
                 return request.build_absolute_uri(obj.image.url)
             return obj.image.url
+        # Fallback to static image path if no uploaded image
+        if hasattr(obj, 'static_image_path') and obj.static_image_path:
+            return obj.static_image_path
         return None
 
     def _parse_frontmatter(self, markdown_text):

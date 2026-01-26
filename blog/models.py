@@ -17,6 +17,8 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     # add optional image upload for posts
     image = models.ImageField(upload_to='posts/', null=True, blank=True)
+    # path to static asset for legacy posts (e.g. "/assets/blog/...")
+    static_image_path = models.CharField(max_length=255, null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     content = models.TextField()
     # status: draft or published
