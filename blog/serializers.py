@@ -24,7 +24,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'author', 'title', 'slug', 'content', 'status', 'published', 'published_at', 'created_at', 'updated_at', 'comments', 'image', 'static_image_path', 'tags', 'markdown']
+        fields = ['id', 'author', 'title', 'slug', 'content', 'status', 'published', 'published_at', 'created_at', 'updated_at', 'comments', 'image', 'static_image_path', 'images', 'video', 'tags', 'markdown']
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -59,10 +59,29 @@ class PostSerializer(serializers.ModelSerializer):
             fm_lines = lines[1:end_idx]
             body_lines = lines[end_idx+1:]
             meta = {}
+            current_array_key = None
             for l in fm_lines:
-                if ':' in l:
+                clean_l = l.strip()
+                if clean_l.startswith('- ') and current_array_key:
+                    val = clean_l[2:].strip().strip('"').strip("'")
+                    if current_array_key not in meta:
+                        meta[current_array_key] = []
+                    meta[current_array_key].append(val)
+                elif ':' in l:
                     k, v = l.split(':', 1)
-                    meta[k.strip()] = v.strip().strip('"').strip("'")
+                    k_clean = k.strip()
+                    v_clean = v.strip().strip('"').strip("'")
+                    if not v_clean:
+                        current_array_key = k_clean
+                        meta[k_clean] = []
+                    elif v_clean.startswith('[') and v_clean.endswith(']'):
+                        # inline array
+                        current_array_key = None
+                        items = [s.strip().strip('"').strip("'") for s in v_clean[1:-1].split(',')]
+                        meta[k_clean] = [i for i in items if i]
+                    else:
+                        current_array_key = None
+                        meta[k_clean] = v_clean
             return meta, '\n'.join(body_lines).lstrip('\n')
         # no frontmatter
         return {}, markdown_text
@@ -71,11 +90,16 @@ class PostSerializer(serializers.ModelSerializer):
         md = validated_data.pop('markdown', None)
         if md:
             meta, body = self._parse_frontmatter(md)
-            # fill in basic fields if present
             if 'title' in meta and not validated_data.get('title'):
                 validated_data['title'] = meta['title']
             if 'slug' in meta and not validated_data.get('slug'):
                 validated_data['slug'] = meta['slug']
+            if 'image' in meta and not validated_data.get('static_image_path'):
+                validated_data['static_image_path'] = meta['image']
+            if 'images' in meta and not validated_data.get('images'):
+                validated_data['images'] = meta['images'] if isinstance(meta['images'], list) else [meta['images']]
+            if 'video' in meta and not validated_data.get('video'):
+                validated_data['video'] = meta['video']
             # store body into content
             validated_data['content'] = body
 
@@ -89,6 +113,12 @@ class PostSerializer(serializers.ModelSerializer):
                 validated_data['title'] = meta['title']
             if 'slug' in meta and not validated_data.get('slug'):
                 validated_data['slug'] = meta['slug']
+            if 'image' in meta and not validated_data.get('static_image_path'):
+                validated_data['static_image_path'] = meta['image']
+            if 'images' in meta and not validated_data.get('images'):
+                validated_data['images'] = meta['images'] if isinstance(meta['images'], list) else [meta['images']]
+            if 'video' in meta and not validated_data.get('video'):
+                validated_data['video'] = meta['video']
             validated_data['content'] = body
 
         return super().update(instance, validated_data)
