@@ -30,9 +30,9 @@ class Post(models.Model):
         (STATUS_DRAFT, 'Draft'),
         (STATUS_PUBLISHED, 'Published'),
     ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_DRAFT)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_DRAFT, db_index=True)
     # kept for compatibility; derived from status on save
-    published = models.BooleanField(default=False)
+    published = models.BooleanField(default=False, db_index=True)
     published_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
