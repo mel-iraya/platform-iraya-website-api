@@ -39,3 +39,4 @@ class TagViewSet(viewsets.ModelViewSet):
 class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.all().order_by('-created_at')
     serializer_class = PublicationSerializer
+    pagination_class = None
