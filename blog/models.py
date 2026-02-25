@@ -80,3 +80,39 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author_name} on {self.post_id}"
+
+
+class Publication(models.Model):
+    # Core explicit UI fields matched from publications.js
+    title = models.CharField(max_length=255)
+    sub_text = models.CharField(max_length=255, blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
+    
+    # either 'content' or 'list'
+    content_type = models.CharField(max_length=20, default='content') 
+    content1 = models.TextField(blank=True, null=True)
+    content2 = models.TextField(blank=True, null=True)
+
+    # either 'image' or 'video'
+    type = models.CharField(max_length=20, default='image')
+    image = models.ImageField(upload_to='publications/', null=True, blank=True)
+    static_image_path = models.CharField(max_length=255, null=True, blank=True)
+    video_id = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Download link to be filled later
+    download_link = models.URLField(max_length=500, blank=True, null=True)
+    
+    # UI Control Flags
+    show_button = models.BooleanField(default=True)
+    button_on_hover = models.BooleanField(default=False)
+    button_color = models.CharField(max_length=50, default='primary')
+    elevation = models.CharField(max_length=10, default='0')
+    email = models.BooleanField(default=False)
+    rounded_img = models.BooleanField(default=False)
+    
+    # DB Metadata
+    status = models.CharField(max_length=10, choices=Post.STATUS_CHOICES, default=Post.STATUS_PUBLISHED)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
