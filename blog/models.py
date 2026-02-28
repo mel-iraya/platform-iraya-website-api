@@ -19,7 +19,6 @@ class Post(models.Model):
     image = models.ImageField(upload_to='posts/', null=True, blank=True)
     # path to static asset for legacy posts (e.g. "/assets/blog/...")
     static_image_path = models.CharField(max_length=255, null=True, blank=True)
-    images = models.JSONField(default=list, blank=True)
     video = models.CharField(max_length=255, null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     content = models.TextField()
@@ -57,6 +56,12 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, related_name='uploaded_images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='posts/gallery/')
+
+    def __str__(self):
+        return f"Image for {self.post.title}"
 
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)

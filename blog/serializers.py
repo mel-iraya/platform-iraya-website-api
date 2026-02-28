@@ -21,6 +21,7 @@ class PostSerializer(serializers.ModelSerializer):
     markdown = serializers.CharField(write_only=True, required=False)
     # represent tags as a list of tag names
     tags = serializers.SlugRelatedField(many=True, slug_field='name', queryset=Tag.objects.all(), required=False)
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -36,6 +37,17 @@ class PostSerializer(serializers.ModelSerializer):
         if hasattr(obj, 'static_image_path') and obj.static_image_path:
             return obj.static_image_path
         return None
+
+    def get_images(self, obj):
+        request = self.context.get('request')
+        image_urls = []
+        for img_obj in obj.uploaded_images.all():
+            if img_obj.image:
+                if request is not None:
+                    image_urls.append(request.build_absolute_uri(img_obj.image.url))
+                else:
+                    image_urls.append(img_obj.image.url)
+        return image_urls
 
     def _parse_frontmatter(self, markdown_text):
         """Return (meta_dict, body_text).
@@ -96,8 +108,6 @@ class PostSerializer(serializers.ModelSerializer):
                 validated_data['slug'] = meta['slug']
             if 'image' in meta and not validated_data.get('static_image_path'):
                 validated_data['static_image_path'] = meta['image']
-            if 'images' in meta and not validated_data.get('images'):
-                validated_data['images'] = meta['images'] if isinstance(meta['images'], list) else [meta['images']]
             if 'video' in meta and not validated_data.get('video'):
                 validated_data['video'] = meta['video']
             # store body into content
@@ -115,8 +125,6 @@ class PostSerializer(serializers.ModelSerializer):
                 validated_data['slug'] = meta['slug']
             if 'image' in meta and not validated_data.get('static_image_path'):
                 validated_data['static_image_path'] = meta['image']
-            if 'images' in meta and not validated_data.get('images'):
-                validated_data['images'] = meta['images'] if isinstance(meta['images'], list) else [meta['images']]
             if 'video' in meta and not validated_data.get('video'):
                 validated_data['video'] = meta['video']
             validated_data['content'] = body

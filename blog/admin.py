@@ -2,7 +2,12 @@ from django.contrib import admin
 from django import forms
 from django.forms import CheckboxSelectMultiple
 from django.utils.html import format_html
-from .models import Author, Post, Comment, Tag, Publication, WelcomePopup
+from .models import Author, Post, Comment, Tag, Publication, WelcomePopup, PostImage
+
+class PostImageInline(admin.TabularInline):
+    model = PostImage
+    extra = 1
+
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
 	list_display = ('id', 'name', 'email', 'created_at')
@@ -19,6 +24,7 @@ class PostAdmin(admin.ModelAdmin):
 	# CheckboxSelectMultiple and a simple checklist of tags.
 	# Speed up author lookups for large user sets
 	raw_id_fields = ('author',)
+	inlines = [PostImageInline]
 
 
 	class PostForm(forms.ModelForm):

@@ -141,7 +141,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # If you'd rather allow all origins during quick local development, you can use:
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Media (for uploaded images) - useful if you add ImageField to your Post model
 MEDIA_URL = '/media/'
