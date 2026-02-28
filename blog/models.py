@@ -15,11 +15,9 @@ class Author(models.Model):
 class Post(models.Model):
     author = models.ForeignKey(Author, related_name='posts', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    # add optional image upload for posts
-    image = models.ImageField(upload_to='posts/', null=True, blank=True)
-    # path to static asset for legacy posts (e.g. "/assets/blog/...")
-    static_image_path = models.CharField(max_length=255, null=True, blank=True)
-    video = models.CharField(max_length=255, null=True, blank=True)
+    # add optional thumbnail upload for posts
+    thumbnail = models.ImageField(upload_to='posts/', null=True, blank=True)
+    video = models.FileField(upload_to='posts/videos/', null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     content = models.TextField()
     # status: draft or published

@@ -8,6 +8,11 @@ class PostImageInline(admin.TabularInline):
     model = PostImage
     extra = 1
 
+@admin.register(PostImage)
+class PostImageAdmin(admin.ModelAdmin):
+	list_display = ('id', 'post', 'image')
+	search_fields = ('post__title',)
+
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
 	list_display = ('id', 'name', 'email', 'created_at')
@@ -17,9 +22,9 @@ class AuthorAdmin(admin.ModelAdmin):
 class PostAdmin(admin.ModelAdmin):
 	# show status (Draft/Published) in the list;
 	# add `is_published` boolean column (derived from status) so admin shows the green/red icon
-	list_display = ('id', 'title', 'author', 'is_published', 'status', 'created_at', 'tags_list', 'image_tag')
+	list_display = ('id', 'title', 'author', 'is_published', 'status', 'created_at', 'tags_list', 'thumbnail_tag')
 	list_filter = ('author', 'status', 'tags')
-	readonly_fields = ('image_tag',)
+	readonly_fields = ('thumbnail_tag',)
 	search_fields = ('title', 'author__name', 'tags__name')
 	# CheckboxSelectMultiple and a simple checklist of tags.
 	# Speed up author lookups for large user sets
@@ -43,11 +48,11 @@ class PostAdmin(admin.ModelAdmin):
 
 	form = PostForm
 
-	def image_tag(self, obj):
-		if obj.image:
-			return format_html('<img src="{}" style="max-height: 100px;" />', obj.image.url)
+	def thumbnail_tag(self, obj):
+		if obj.thumbnail:
+			return format_html('<img src="{}" style="max-height: 100px;" />', obj.thumbnail.url)
 		return ''
-	image_tag.short_description = 'Image'
+	thumbnail_tag.short_description = 'Thumbnail'
 
 	def is_published(self, obj):
 		"""Boolean column derived from `status`.

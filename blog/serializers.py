@@ -10,7 +10,8 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     author = serializers.PrimaryKeyRelatedField(queryset=Author.objects.all())
-    image = serializers.SerializerMethodField()
+    thumbnail = serializers.SerializerMethodField()
+    video = serializers.SerializerMethodField()
     # allow posting `markdown` without separately sending title/content fields
     title = serializers.CharField(required=False)
     content = serializers.CharField(required=False)
@@ -25,17 +26,22 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'author', 'title', 'slug', 'content', 'status', 'published', 'published_at', 'created_at', 'updated_at', 'comments', 'image', 'static_image_path', 'images', 'video', 'tags', 'markdown']
+        fields = ['id', 'author', 'title', 'slug', 'content', 'status', 'published', 'published_at', 'created_at', 'updated_at', 'comments', 'thumbnail', 'images', 'video', 'tags', 'markdown']
 
-    def get_image(self, obj):
+    def get_thumbnail(self, obj):
         request = self.context.get('request')
-        if hasattr(obj, 'image') and obj.image:
+        if hasattr(obj, 'thumbnail') and obj.thumbnail:
             if request is not None:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        # Fallback to static image path if no uploaded image
-        if hasattr(obj, 'static_image_path') and obj.static_image_path:
-            return obj.static_image_path
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+
+    def get_video(self, obj):
+        request = self.context.get('request')
+        if hasattr(obj, 'video') and obj.video:
+            if request is not None:
+                return request.build_absolute_uri(obj.video.url)
+            return obj.video.url
         return None
 
     def get_images(self, obj):
@@ -106,8 +112,10 @@ class PostSerializer(serializers.ModelSerializer):
                 validated_data['title'] = meta['title']
             if 'slug' in meta and not validated_data.get('slug'):
                 validated_data['slug'] = meta['slug']
-            if 'image' in meta and not validated_data.get('static_image_path'):
-                validated_data['static_image_path'] = meta['image']
+            if 'thumbnail' in meta and not validated_data.get('thumbnail'):
+                # Handle how thumbnail from markdown should be applied. 
+                # previously it mapped to static_image_path. We can just ignore it or log it since we removed static_image_path.
+                pass
             if 'video' in meta and not validated_data.get('video'):
                 validated_data['video'] = meta['video']
             # store body into content
@@ -123,8 +131,8 @@ class PostSerializer(serializers.ModelSerializer):
                 validated_data['title'] = meta['title']
             if 'slug' in meta and not validated_data.get('slug'):
                 validated_data['slug'] = meta['slug']
-            if 'image' in meta and not validated_data.get('static_image_path'):
-                validated_data['static_image_path'] = meta['image']
+            if 'thumbnail' in meta and not validated_data.get('thumbnail'):
+                pass
             if 'video' in meta and not validated_data.get('video'):
                 validated_data['video'] = meta['video']
             validated_data['content'] = body
