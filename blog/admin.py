@@ -2,9 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.forms import CheckboxSelectMultiple
 from django.utils.html import format_html
-from .models import Author, Post, Comment, Tag
-
-
+from .models import Author, Post, Comment, Tag, Publication, WelcomePopup
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
 	list_display = ('id', 'name', 'email', 'created_at')
@@ -70,3 +68,17 @@ class TagAdmin(admin.ModelAdmin):
 	list_display = ('id', 'name', 'slug')
 	search_fields = ('name',)
 	prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(Publication)
+class PublicationAdmin(admin.ModelAdmin):
+	list_display = ('id', 'title', 'type', 'status', 'created_at')
+	list_filter = ('type', 'status', 'content_type')
+	search_fields = ('title', 'sub_text')
+
+
+@admin.register(WelcomePopup)
+class WelcomePopupAdmin(admin.ModelAdmin):
+	list_display = ('id', 'title', 'is_active', 'created_at')
+	list_filter = ('is_active',)
+	search_fields = ('title',)
