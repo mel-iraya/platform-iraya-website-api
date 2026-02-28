@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Author, Post, Comment, Tag, Publication
+from .models import Author, Post, Comment, Tag, Publication, WelcomePopup
 import re
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -153,4 +153,19 @@ class PublicationSerializer(serializers.ModelSerializer):
             return obj.image.url
         if hasattr(obj, 'static_image_path') and obj.static_image_path:
             return obj.static_image_path
+        return None
+
+class WelcomePopupSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = WelcomePopup
+        fields = '__all__'
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if hasattr(obj, 'image') and obj.image:
+            if request is not None:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
         return None
