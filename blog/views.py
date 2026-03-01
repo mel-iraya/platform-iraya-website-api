@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.db.models import Q
 from rest_framework import viewsets
-from .models import Author, Post, Comment, Tag, Publication, WelcomePopup
-from .serializers import AuthorSerializer, PostSerializer, CommentSerializer, TagSerializer, PublicationSerializer, WelcomePopupSerializer
+from .models import Author, Post, Comment, Tag, Publication, WelcomePopup, Brochure
+from .serializers import AuthorSerializer, PostSerializer, CommentSerializer, TagSerializer, PublicationSerializer, WelcomePopupSerializer, BrochureSerializer
 
 # Create your views here.
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -53,3 +53,8 @@ class WelcomePopupViewSet(viewsets.ModelViewSet):
             active_bool = is_active.lower() == 'true'
             qs = qs.filter(is_active=active_bool)
         return qs
+
+class BrochureViewSet(viewsets.ModelViewSet):
+    queryset = Brochure.objects.all().order_by('-created_at')
+    serializer_class = BrochureSerializer
+    pagination_class = None

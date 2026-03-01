@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Author, Post, Comment, Tag, Publication, WelcomePopup
+from .models import Author, Post, Comment, Tag, Publication, WelcomePopup, Brochure
 import re
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -184,4 +184,28 @@ class WelcomePopupSerializer(serializers.ModelSerializer):
             if request is not None:
                 return request.build_absolute_uri(obj.image.url)
             return obj.image.url
+        return None
+
+class BrochureSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    file = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Brochure
+        fields = '__all__'
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if hasattr(obj, 'image') and obj.image:
+            if request is not None:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+        
+    def get_file(self, obj):
+        request = self.context.get('request')
+        if hasattr(obj, 'file') and obj.file:
+            if request is not None:
+                return request.build_absolute_uri(obj.file.url)
+            return obj.file.url
         return None

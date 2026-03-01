@@ -134,3 +134,20 @@ class WelcomePopup(models.Model):
 
     def __str__(self):
         return self.title
+
+class Brochure(models.Model):
+    title = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='brochures/', null=True, blank=True)
+    image_max_width = models.CharField(default="400px", max_length=50)
+    image_max_height = models.CharField(default="380px", max_length=50)
+    card_height = models.IntegerField(default=350)
+    text_content = models.TextField()
+    text_column_classes = models.CharField(default="pl-xl-2 pl-md-16 mt-6", max_length=255)
+    button_elevation = models.CharField(default='3', max_length=50)
+    button_color = models.CharField(default='primary-lighten-1', max_length=50)
+    button_hover_success = models.BooleanField(default=True)
+    file = models.FileField(upload_to='brochures/pdfs/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
