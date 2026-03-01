@@ -156,6 +156,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class PublicationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    download_link = serializers.SerializerMethodField()
 
     class Meta:
         model = Publication
@@ -167,8 +168,14 @@ class PublicationSerializer(serializers.ModelSerializer):
             if request is not None:
                 return request.build_absolute_uri(obj.image.url)
             return obj.image.url
-        if hasattr(obj, 'static_image_path') and obj.static_image_path:
-            return obj.static_image_path
+        return None
+
+    def get_download_link(self, obj):
+        request = self.context.get('request')
+        if hasattr(obj, 'pdf_file') and obj.pdf_file:
+            if request is not None:
+                return request.build_absolute_uri(obj.pdf_file.url)
+            return obj.pdf_file.url
         return None
 
 class WelcomePopupSerializer(serializers.ModelSerializer):

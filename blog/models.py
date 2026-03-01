@@ -99,11 +99,10 @@ class Publication(models.Model):
     # either 'image' or 'video'
     type = models.CharField(max_length=20, default='image')
     image = models.ImageField(upload_to='publications/', null=True, blank=True)
-    static_image_path = models.CharField(max_length=255, null=True, blank=True)
     video_id = models.CharField(max_length=100, blank=True, null=True)
     
-    # Download link to be filled later
-    download_link = models.URLField(max_length=500, blank=True, null=True)
+    # PDF File Download
+    pdf_file = models.FileField(upload_to='publications/files/', max_length=500, null=True, blank=True)
     
     # UI Control Flags
     show_button = models.BooleanField(default=True)
