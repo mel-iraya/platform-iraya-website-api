@@ -214,14 +214,17 @@ success "Static files collected."
 # ── Fix file permissions for Nginx ───────────────────────────────────────────
 info "Setting file permissions for Nginx (www-data) ..."
 
-# Make the project directory traversable
-chmod 755 "$PROJECT_DIR"
+# Nginx (www-data) needs execute (traversal) permission on EVERY parent
+# directory in the path leading to the project. Without this, Nginx gets
+# 403 Forbidden even if the files themselves are readable.
+CURRENT_DIR="$PROJECT_DIR"
+while [[ "$CURRENT_DIR" != "/" ]]; do
+    chmod o+x "$CURRENT_DIR"
+    CURRENT_DIR="$(dirname "$CURRENT_DIR")"
+done
 
-# Give www-data group ownership and read access to static & media dirs
-chown -R root:www-data "$PROJECT_DIR/staticfiles"
+# Make static and media files world-readable
 chmod -R 755 "$PROJECT_DIR/staticfiles"
-
-chown -R root:www-data "$PROJECT_DIR/media"
 chmod -R 755 "$PROJECT_DIR/media"
 
 success "File permissions set — Nginx can now serve static and media files."
