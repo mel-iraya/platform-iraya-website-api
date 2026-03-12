@@ -102,8 +102,8 @@ if ! command -v psql &>/dev/null; then
         > /etc/apt/sources.list.d/pgdg.list'
     curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
     apt-get update -y
-    apt-get install -y postgresql-16
-    success "PostgreSQL 16 installed."
+    apt-get install -y postgresql-18
+    success "PostgreSQL 18 installed."
 else
     warn "PostgreSQL is already installed ($(psql --version))."
 fi
