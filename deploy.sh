@@ -211,6 +211,21 @@ fi
 python manage.py collectstatic --noinput
 success "Static files collected."
 
+# ── Fix file permissions for Nginx ───────────────────────────────────────────
+info "Setting file permissions for Nginx (www-data) ..."
+
+# Make the project directory traversable
+chmod 755 "$PROJECT_DIR"
+
+# Give www-data group ownership and read access to static & media dirs
+chown -R root:www-data "$PROJECT_DIR/staticfiles"
+chmod -R 755 "$PROJECT_DIR/staticfiles"
+
+chown -R root:www-data "$PROJECT_DIR/media"
+chmod -R 755 "$PROJECT_DIR/media"
+
+success "File permissions set — Nginx can now serve static and media files."
+
 # ── 8. Gunicorn systemd service ──────────────────────────────────────────────
 echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 echo -e "${CYAN}  Step 7/8 — Configuring Gunicorn Service${NC}"
