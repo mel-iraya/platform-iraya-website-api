@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AuthorViewSet, PostViewSet, CommentViewSet, TagViewSet, PublicationViewSet, WelcomePopupViewSet, BrochureViewSet
+from .views import AuthorViewSet, PostViewSet, CommentViewSet, TagViewSet, PublicationViewSet, WelcomePopupViewSet, BrochureViewSet, TrialRequestViewSet
 
 router = DefaultRouter()
 router.register(r'authors', AuthorViewSet)
@@ -10,6 +10,7 @@ router.register(r'tags', TagViewSet)
 router.register(r'publications', PublicationViewSet)
 router.register(r'welcome-popups', WelcomePopupViewSet)
 router.register(r'brochures', BrochureViewSet)
+router.register(r'trial-requests', TrialRequestViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
