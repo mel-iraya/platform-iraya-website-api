@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.forms import CheckboxSelectMultiple
 from django.utils.html import format_html
-from .models import Author, Post, Comment, Tag, Publication, WelcomePopup, PostImage, Brochure
+from .models import Author, Post, Comment, Tag, Publication, WelcomePopup, PostImage, Brochure, TrialRequest
 
 class PostImageInline(admin.TabularInline):
     model = PostImage
@@ -98,3 +98,9 @@ class WelcomePopupAdmin(admin.ModelAdmin):
 class BrochureAdmin(admin.ModelAdmin):
 	list_display = ('id', 'title', 'created_at')
 	search_fields = ('title',)
+
+@admin.register(TrialRequest)
+class TrialRequestAdmin(admin.ModelAdmin):
+	list_display = ('id', 'first_name', 'last_name', 'email', 'company', 'product', 'created_at')
+	search_fields = ('first_name', 'last_name', 'email', 'company')
+	list_filter = ('product', 'created_at')

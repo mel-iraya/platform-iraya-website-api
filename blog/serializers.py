@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Author, Post, Comment, Tag, Publication, WelcomePopup, Brochure
+from .models import Author, Post, Comment, Tag, Publication, WelcomePopup, Brochure, TrialRequest
 import re
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -216,3 +216,8 @@ class BrochureSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.file.url)
             return obj.file.url
         return None
+
+class TrialRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrialRequest
+        fields = '__all__'
